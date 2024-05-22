@@ -1,0 +1,78 @@
+<%
+  if @staff_member
+    full_name = @staff_member.family_name + @staff_member.given_name
+    @title = "#{full_name}さんのログイン・ログアウト記録"
+  else
+    @title = "職員のログイン・ログアウト記録"
+  end
+%>
+<h1><%= @title %></h1>
+
+<div class="table-wrapper">
+  <div class="links">
+    <%= link_to "職員一覧", :admin_staff_members %>
+  </div>
+
+  <%= paginate @events %>
+
+  <table class="listing">
+    <tr>
+      <% unless @staff_member %><th>氏名</th><% end %>
+      <th>種別</th>
+      <th>日時</th>
+    </tr>
+    <% @events.each do |event| %>
+      <%= StaffEventPresenter.new(event, self).table_row %>
+    <% end %>
+    <% if @events.empty? %>
+      <tr>
+        <%= content_tag(:td, "記録がありません",
+          colspan: @staff_member ? 2 : 3, style: "text-align: center") %>
+      </tr>
+    <% end %>
+  </table>
+
+  <%= paginate @events %>
+
+  <div class="links">
+    <%= link_to "職員一覧", :admin_staff_members %>
+  </div>
+</div>
+
+<%
+=begin%>
+ #このコードはRuby on Railsのヘルパーメソッド`content_tag`を使用しています。`content_tag`メソッドは、指定したタグ名と内容でHTMLタグを動的に生成するために使われます。この場合は、条件に応じて属性を持つ`<td>`タグを生成しています。
+
+### コードの解説
+
+- `content_tag(:td, "記録がありません")`:
+  - `:td`は生成されるHTMLタグの種類を指定します。ここではテーブルのデータセル（`<td>`）を作成しています。
+  - `"記録がありません"`は、生成された`<td>`タグの中に表示されるテキスト内容です。
+
+- `colspan: @staff_member ? 2 : 3`:
+  - `colspan`はHTMLのテーブルセルが横にまたがる列の数を指定する属性です。
+  - `@staff_member ? 2 : 3`は条件演算子（三項演算子）を使用しています。これにより、`@staff_member`が存在する（つまり`true`の場合）は`colspan`属性を`2`に、存在しない（`nil`または`false`の場合）は`3`に設定しています。これは、`@staff_member`が存在するかどうかに応じてテーブルの列幅を調整するためです。
+
+- `style: "text-align: center"`:
+  - `style`はHTMLタグに直接スタイルを適用する属性です。
+  - `"text-align: center"`はそのセルのテキストを中央寄せにするCSSスタイルを適用しています。
+
+### 生成されるHTMLの例
+
+条件によって、以下のようなHTMLが生成される可能性があります：
+
+1. **@staff_memberが存在する場合**:
+   ```html
+   <td colspan="2" style="text-align: center">記録がありません</td>
+   ```
+   この場合、テーブルセルは2列にまたがり、テキストは中央に配置されます。
+
+2. **@staff_memberが存在しない場合**:
+   ```html
+   <td colspan="3" style="text-align: center">記録がありません</td>
+   ```
+   ここでは、テーブルセルは3列にまたがります。これは、氏名列が追加されるため、全体の列数が増えるためです。
+
+この`content_tag`ヘルパーの使用により、コードの可読性が向上し、条件に応じた動的なHTML生成が容易になります。また、直接HTMLを書くよりも、Rubyのコード内で条件や属性を管理する方が、エラーが少なく安全です。 
+<%
+=end%>
